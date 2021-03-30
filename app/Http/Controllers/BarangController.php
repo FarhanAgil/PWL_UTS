@@ -1,11 +1,10 @@
 <?php
 
 namespace App\Http\Controllers;
-
 use App\Models\Barang;
 use Illuminate\Http\Request;
 
-class BarangCOntroller extends Controller
+class BarangController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -14,8 +13,8 @@ class BarangCOntroller extends Controller
      */
     public function index()
     {
-        $barang = Barang::paginate(1);
-        return view('barangs.index', ['barang' => $barang]);
+        $Barang = Barang::paginate(5);
+        return view('barang.index', ['barang' => $Barang]);
     }
 
     /**
@@ -25,7 +24,7 @@ class BarangCOntroller extends Controller
      */
     public function create()
     {
-        return view('barangs.create');
+        return view('barang.create');
     }
 
     /**
@@ -46,7 +45,7 @@ class BarangCOntroller extends Controller
         ]);
 
         Barang::create($request->all);
-        return redirect()->route('barangs.index')
+        return redirect()->route('barang.index')
         ->with('success', 'Barang Berhasil Ditambahkan');
    
     }
@@ -60,7 +59,7 @@ class BarangCOntroller extends Controller
     public function show($id)
     {
         $Barang = Barang::find($id);
-        return view('barangs.index', compact('Barang'));
+        return view('barang.index', compact('barang'));
     }
 
     /**
@@ -72,7 +71,7 @@ class BarangCOntroller extends Controller
     public function edit($id)
     {
         $Barang = Barang::find($id);
-        return view('barangs.index', compact('Barang'));
+        return view('barang.index', compact('barang'));
     }
 
     /**
@@ -97,7 +96,7 @@ class BarangCOntroller extends Controller
          Barang::find($id)->update($request->all());
 
          //jika data berhasil diupdate, akan kembali ke halaman utama
-         return redirect()->route('barangs.index')->with('success', 'Barang Berhasil Diupdate');  
+         return redirect()->route('barang.index')->with('success', 'Barang Berhasil Diupdate');  
     }
 
     /**
@@ -109,7 +108,18 @@ class BarangCOntroller extends Controller
     public function destroy($id)
     {
         Barang::find($id)->delete();
-        return redirect()->route('barangs.index')
+        return redirect()->route('barang.index')
         -> with('success', 'Barang Berhasil Dihapus');
+    }
+    public function search(Request $request)
+    {
+        $Barang = Barang::when($request->keyword, function ($query) use ($request) {
+            $query->where('nama_barang', 'like', "%{$request->keyword}%")
+                ->orWhere('id_barang', 'like', "%{$request->keyword}%")
+                ->orWhere('kode_barang', 'like', "%{$request->keyword}%")
+                ->orWhere('kode_barang', 'like', "%{$request->keyword}%");
+        })->paginate(5);
+        $Barang->appends($request->only('keyword'));
+        return view('barang.index', compact('barang'));
     }
 }
