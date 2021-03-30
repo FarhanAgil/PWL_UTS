@@ -13,6 +13,9 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
+Route::resource('barang', BarangCOntroller::class);
+Route::get('barang/cari/',[BarangCOntroller::class, 'search']);
+
 Route::get('/', function () {
     return view('welcome');
 });
